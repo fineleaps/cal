@@ -3,7 +3,7 @@ from .models import Campaign, Prospect, Lead, DNC, Executive
 from django.shortcuts import get_object_or_404, render
 from  django.http import HttpResponseRedirect
 
-
+# pull changes
 # class ExecutiveInline(admin.TabularInline):
 #     model = Executive
 
