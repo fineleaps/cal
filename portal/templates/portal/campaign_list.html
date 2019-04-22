@@ -1,0 +1,44 @@
+{% extends "portal/base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+    <div class="jumbotron text-center">
+        <h3>My Campaigns</h3>
+
+        <hr>
+
+        {% if campaigns %}
+
+            <table class="table table-stripped table-bordered">
+
+                <tr>
+                    <td>Sr No.</td>
+                    <td>Name</td>
+                    <td>Start Date</td>
+                    <td>End Date</td>
+                    <td>Status</td>
+                </tr>
+
+                {% for campaign in campaigns %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>
+                            <a href="{% url "campaign_detail" pk=campaign.id %}">{{ campaign.name }}</a></td>
+                        <td>{{ campaign.start_date }}</td>
+                        <td>{{ campaign.end_date }}</td>
+                        <td>{{ campaign.active_status }}</td>
+                    </tr>
+                {% endfor %}
+
+            </table>
+
+        {% else %}
+
+            <h3>No Campaigns assigned for you.</h3>
+
+        {% endif %}
+
+    </div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "portal/base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+    <div class="jumbotron text-center">
+        <h3>Login</h3><br>
+
+        <form method="post">
+
+            {% csrf_token %}
+
+            {{ form.as_p }}
+
+            <input type="submit" value="Login" class="btn btn-info">
+
+        </form>
+
+    </div>
+
+{% endblock %}

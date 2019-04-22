@@ -1,0 +1,37 @@
+{% extends "portal/base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+    <div class="jumbotron text-center">
+        {% if campaign %}
+
+            <h3>{{ campaign.name }}</h3>
+
+            <table class="table table-stripped table-bordered">
+
+                <tr>
+                    <td>Name</td>
+                    <td>{{ campaign.name }}</td>
+                </tr>
+                <tr>
+                    <td>Start Date</td>
+                    <td>{{ campaign.start_date }}</td>
+                </tr>
+                <tr>
+                    <td>End Date</td>
+                    <td>{{ campaign.end_date }}</td>
+
+                </tr>
+                <tr>
+                    <td>Status</td>
+                    <td>{{ campaign.active_status }}</td>
+                </tr>
+
+            </table>
+
+        {% endif %}
+
+    </div>
+{% endblock %}

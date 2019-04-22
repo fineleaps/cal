@@ -1,0 +1,21 @@
+{% extends "portal/base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+    <div class="jumbotron text-center">
+        <h3>Welcome to FLS-CRM</h3>
+
+        <a href="{% url 'profile' %}"><button class="btn btn-primary">My Profile</button></a>
+
+        <br><br><br><hr>
+
+        <a href="{% url "campaign_list" %}" ><button class="btn btn-primary">Campaigns</button></a>
+        <br><br>
+        <a href="{% url 'logout' %}"><button class="btn btn-danger">Logout</button></a>
+
+
+
+    </div>
+{% endblock %}
