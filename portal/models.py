@@ -2,7 +2,9 @@ from django.db import models
 from django.conf import settings
 import datetime
 from django.core.validators import ValidationError
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponse
 
 class Executive(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
@@ -49,7 +51,6 @@ def executive_campaign_active_check(instance, sender, *args, **kwargs):
 pre_save.connect(executive_campaign_active_check, CampaignExecutiveRelation)
 
 
-
 class Prospect(models.Model):
     first_name = models.CharField(max_length=32)
     last_name = models.CharField(max_length=32)
@@ -75,9 +76,38 @@ class Prospect(models.Model):
     def __str__(self):
         return self.full_name
 
+    @property
+    def released(self):
+        return self.prospectcampaignrelation.released
 
 
+def save_campaign_relation(sender, instance, *args, **kwargs):
+    try:
+        pcr = ProspectCampaignRelation.objects.get(prospect=instance)
+        print(pcr)
+        if pcr.campaign != instance.assigned_campaign:
+            pcr.campaign = instance.assigned_campaign
+            pcr.save()
+    except ObjectDoesNotExist:
+        print(555)
+        # ProspectCampaignRelation.objects.create(prospect=instance, campaign=instance.assigned_campaign)
 
+
+post_save.connect(save_campaign_relation, sender=Prospect)
+
+
+class ProspectCampaignRelation(models.Model):
+    prospect = models.OneToOneField(Prospect, on_delete=models.CASCADE)
+    campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE)
+    from_date = models.DateField(auto_now_add=True)
+    released = models.BooleanField(default=False)
+
+    def __str__(self):
+        return "{} -- {}".format(self.prospect, self.campaign)
+
+    # class Meta:
+    #     unique_together = ('prospect', 'campaign')
+    #
 
 
 

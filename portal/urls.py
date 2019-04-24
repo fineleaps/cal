@@ -12,7 +12,9 @@ urlpatterns = [
 
 
     url(r'^campaign/list/$', views.CampaignListView.as_view(), name='campaign_list'),
-    path('campaign/detail/<int:pk>/', views.CampaignDetailView.as_view(), name='campaign_detail')
+    path('campaign/detail/<int:pk>/', views.CampaignDetailView.as_view(), name='campaign_detail'),
 
+
+    url(r'^prospect/get/(?P<campaign_id>[0-9]+)$', views.prospect_get, name='prospect_get'),
 
 ]

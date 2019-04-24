@@ -9,6 +9,8 @@
 
             <h3>{{ campaign.name }}</h3>
 
+            <a href="{% url 'prospect_get' campaign_id=campaign.id %}"><button class="btn btn-primary">Get Prospect</button></a>
+
             <table class="table table-stripped table-bordered">
 
                 <tr>

@@ -1,9 +1,10 @@
 from django.contrib import admin
-from .models import Campaign, Prospect, Lead, DNC, Executive
+from .models import Campaign, Prospect, Lead, DNC, Executive, ProspectCampaignRelation
 from django.shortcuts import get_object_or_404, render
 from  django.http import HttpResponseRedirect
 
 # pull changes
+# bdifsdiufh
 # class ExecutiveInline(admin.TabularInline):
 #     model = Executive
 
@@ -19,7 +20,9 @@ admin.site.register(Campaign, CampaignAdmin)
 
 class ProspectAdmin(admin.ModelAdmin):
 
-    list_filter = ('job_title', 'emp_size', 'industry_type', 'state')
+    list_filter = ('job_title', 'emp_size', 'industry_type', 'state', 'prospectcampaignrelation__released')
+    list_display = ('full_name', 'job_title', 'industry_type', 'state', 'released')
+
 
     actions = ('assign_campaign', )
 
@@ -49,3 +52,5 @@ admin.site.register(Prospect, ProspectAdmin)
 admin.site.register(Lead)
 admin.site.register(DNC)
 admin.site.register(Executive)
+admin.site.register(ProspectCampaignRelation)
+
