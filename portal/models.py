@@ -6,6 +6,7 @@ from django.db.models.signals import pre_save, post_save
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 
+
 class Executive(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     date_of_birth = models.DateField(blank=True, null=True)
@@ -26,29 +27,56 @@ class Campaign(models.Model):
     start_date = models.DateField(blank=True)
     end_date = models.DateField(blank=True)
     executives = models.ManyToManyField(Executive, blank=True)
+    prospects = models.ManyToManyField('Prospect', blank=True, through='ProspectCampaignRelation')
 
     def __str__(self):
         return self.name
 
+    def prospects_attempted(self):
+        return self.prospects.filter(prospectcampaignrelation__attempted=True)
 
-class CampaignExecutiveRelation(models.Model):
+    def prospects_non_attempted(self):
+        return self.prospects.filter(prospectcampaignrelation__attempted=False)
+
+    def prospect_get(self):
+        f_prospect = self.prospects_non_attempted().first()
+        if f_prospect:
+            f_prospect.make_campaign_attempted(self.id)
+            return f_prospect
+        else:
+            return False
+
+
+class ProspectCampaignRelation(models.Model):
+    prospect = models.ForeignKey('Prospect', on_delete=models.CASCADE)
     campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE)
-    executive = models.ForeignKey(Executive, on_delete=models.CASCADE)
-    active = models.BooleanField(default=False)
-    from_date = models.DateField(blank=True)
-    end_date = models.DateField(blank=True)
-    details = models.TextField(blank=True)
+    from_date = models.DateField(auto_now_add=True)
+    attempted = models.BooleanField(default=False)
 
     def __str__(self):
-        return "{} -- {}".format(self.campaign.name, self.executive.user)
+        return "{} -- {}".format(self.prospect, self.campaign)
+
+    class Meta:
+        unique_together = ('prospect', 'campaign')
 
 
-def executive_campaign_active_check(instance, sender, *args, **kwargs):
-    if instance.campaign_executive_relation_set.filter(active=True).count > 0:
-        raise ValidationError
+AttemptResultChoices = (('Lead', 'Lead'), ('View', 'View'), ('DNC', 'DNC'))
 
 
-pre_save.connect(executive_campaign_active_check, CampaignExecutiveRelation)
+class AttemptResult(models.Model):
+    prospect_campaign_relation = models.OneToOneField(ProspectCampaignRelation, on_delete=models.CASCADE)
+    on = models.DateTimeField(auto_now_add=True)
+    by = models.ForeignKey(Executive, on_delete=models.CASCADE)
+    result = models.CharField(max_length=20, choices=AttemptResultChoices)
+    details = models.TextField()
+
+    def __str__(self):
+        return "{} -{} - {}".format(self.prospect_campaign_relation.prospect, self.prospect_campaign_relation.campaign,
+                              self.result)
+
+    def clean(self):
+        if not self.prospect_campaign_relation.attempted:
+            raise ValidationError('Prospect must be attempted to save attempt result')
 
 
 class Prospect(models.Model):
@@ -67,8 +95,6 @@ class Prospect(models.Model):
     country = models.CharField(max_length=32, blank=True)
     zip_code = models.IntegerField(blank=True, null=True)
 
-    assigned_campaign = models.ForeignKey(Campaign, on_delete=models.SET_NULL, blank=True, null=True)
-
     @property
     def full_name(self):
         return self.first_name + ' ' + self.last_name
@@ -76,70 +102,11 @@ class Prospect(models.Model):
     def __str__(self):
         return self.full_name
 
-    @property
-    def released(self):
-        return self.prospectcampaignrelation.released
+    def campaigns_assigned(self):
+        return self.campaign_set.all()
 
-
-def save_campaign_relation(sender, instance, *args, **kwargs):
-    try:
-        pcr = ProspectCampaignRelation.objects.get(prospect=instance)
-        print(pcr)
-        if pcr.campaign != instance.assigned_campaign:
-            pcr.campaign = instance.assigned_campaign
-            pcr.save()
-    except ObjectDoesNotExist:
-        print(555)
-        # ProspectCampaignRelation.objects.create(prospect=instance, campaign=instance.assigned_campaign)
-
-
-post_save.connect(save_campaign_relation, sender=Prospect)
-
-
-class ProspectCampaignRelation(models.Model):
-    prospect = models.OneToOneField(Prospect, on_delete=models.CASCADE)
-    campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE)
-    from_date = models.DateField(auto_now_add=True)
-    released = models.BooleanField(default=False)
-
-    def __str__(self):
-        return "{} -- {}".format(self.prospect, self.campaign)
-
-    # class Meta:
-    #     unique_together = ('prospect', 'campaign')
-    #
-
-
-
-
-
-
-
-
-
-class Lead(models.Model):
-    prospect = models.ForeignKey(Prospect, on_delete=models.CASCADE)
-    campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE)
-    executive = models.ForeignKey(Executive, on_delete=models.CASCADE)
-    text = models.TextField(blank=True)
-    on = models.DateField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ('campaign', 'prospect')
-
-    def __str__(self):
-        return "{} -- {}".format(self.prospect, self.campaign.name)
-
-
-class DNC(models.Model):
-    prospect = models.ForeignKey(Prospect, on_delete=models.CASCADE)
-    campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE)
-    executive = models.ForeignKey(Executive, on_delete=models.CASCADE)
-    text = models.TextField(blank=True)
-    on = models.DateField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ('campaign', 'prospect')
-
-    def __str__(self):
-        return "{} -- {}".format(self.prospect, self.campaign.name)
+    def make_campaign_attempted(self, campaign_id):
+        pcr = self.prospectcampaignrelation_set.get(campaign_id=campaign_id)
+        pcr.attempted = True
+        pcr.save()
+        """ Remember to use .filter with update method if this got slow"""

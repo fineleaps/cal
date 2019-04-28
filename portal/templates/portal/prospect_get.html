@@ -9,7 +9,6 @@
 
             <h3>{{ prospect.full_name }}</h3>
 
-            <a href="{% url 'prospect_get' campaign_id=campaign.id%}"><button class="btn btn-primary">Get Prospect</button></a>
 
             <table class="table table-stripped table-bordered">
 
@@ -25,6 +24,19 @@
                 {% endfor %}
 
             </table>
+
+            <form method="post" action="{% url 'prospect_attempt_result_add' campaign_id=campaign.id prospect_id=prospect.id %}">
+                {% csrf_token %}
+                <select name="result">
+                    <option value="Lead">Lead</option>
+                    <option value="View">View</option>
+                    <option value="DNC">DNC</option>
+                </select>
+                <input name="details">
+                <button class="btn btn-primary" type="submit">Save</button>
+            </form>
+
+{#            <a href="{% url 'prospect_get' campaign_id=campaign.id%}"><button class="btn btn-primary">Get Prospect</button></a>#}
 
         {% elif no_results %}
 
