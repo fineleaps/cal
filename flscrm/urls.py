@@ -20,5 +20,6 @@ from django.conf.urls import url, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'', include('portal.urls')),
+    url(r'^crm_admin/', include('crm_admin.urls'), name='crm_admin')
 
 ]

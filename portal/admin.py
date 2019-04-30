@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Campaign, Prospect, Executive, ProspectCampaignRelation, AttemptResult
+from .models import Campaign, Prospect, Executive, ProspectCampaignRelation, AttemptResult, CampaignSepration
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponseRedirect
 
@@ -10,6 +10,12 @@ from django.http import HttpResponseRedirect
 
 
 class CampaignAdmin(admin.ModelAdmin):
+    class Media:
+        js = ['admin/js/mselect-to-mcheckbox.js', ]
+        css = {
+            'all': ('admin/css/mselect-to-mcheckbox.css', )
+        }
+    #   TO MAKE SELECT-MULTIPLE WIDGET CLEAN
 
     list_display = ('name', 'active_status', 'start_date', 'end_date')
     # inlines = [ExecutiveInline, ]
@@ -55,3 +61,11 @@ admin.site.register(Prospect, ProspectAdmin)
 admin.site.register(Executive)
 admin.site.register(ProspectCampaignRelation, ProspectCampaignRelationAdmin)
 admin.site.register(AttemptResult, AttemptResultAdmin)
+admin.site.register(CampaignSepration)
+
+class myModelAdmin(admin.ModelAdmin):
+  class Media:
+    js = ['admin/js/mselect-to-mcheckbox.js']
+    css = {
+      'all': ('admin/css/mselect-to-mcheckbox.css')
+    }

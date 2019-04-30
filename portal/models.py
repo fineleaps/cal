@@ -52,6 +52,7 @@ class ProspectCampaignRelation(models.Model):
     campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE)
     from_date = models.DateField(auto_now_add=True)
     attempted = models.BooleanField(default=False)
+    details = models.TextField(blank=True)
 
     def __str__(self):
         return "{} -- {}".format(self.prospect, self.campaign)
@@ -68,7 +69,7 @@ class AttemptResult(models.Model):
     on = models.DateTimeField(auto_now_add=True)
     by = models.ForeignKey(Executive, on_delete=models.CASCADE)
     result = models.CharField(max_length=20, choices=AttemptResultChoices)
-    details = models.TextField()
+    details = models.TextField(blank=True)
 
     def __str__(self):
         return "{} -{} - {}".format(self.prospect_campaign_relation.prospect, self.prospect_campaign_relation.campaign,
@@ -94,6 +95,7 @@ class Prospect(models.Model):
     state = models.CharField(max_length=32, blank=True)
     country = models.CharField(max_length=32, blank=True)
     zip_code = models.IntegerField(blank=True, null=True)
+    details = models.TextField(blank=True)
 
     @property
     def full_name(self):
@@ -110,3 +112,13 @@ class Prospect(models.Model):
         pcr.attempted = True
         pcr.save()
         """ Remember to use .filter with update method if this got slow"""
+
+
+class CampaignSepration(models.Model):
+    name = models.CharField(max_length=32)
+    file = models.FileField(upload_to='separation_files/')
+    details = models.TextField(blank=True)
+    campaign = models.ManyToManyField(Campaign, blank=True)
+
+    def __str__(self):
+        return self.name

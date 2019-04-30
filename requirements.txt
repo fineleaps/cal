@@ -1,3 +1,6 @@
 django==2
 django-phone-field
 django-admin-list-filter-dropdown
+django-crispy-forms
+django-filter
+django-smart-selects

@@ -1,0 +1,26 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+    <form action="" method="post">
+      {% csrf_token %}
+        <p>
+        Are you sure you want to assign following prospects to campaign?
+        </p>
+      {% for prospect in prospects %}
+        <p>
+          {{ prospect }}
+        </p>
+        <input type="hidden" name="_selected_action" value="{{ prospect.pk }}" />
+      {% endfor %}
+
+      <input type="hidden" name="action" value="assign_campaign" />
+        <h4>Please select a Campaign from Dropdown </h4>
+
+        <select name="campaign_id">
+            {% for campaign in campaigns %}
+                        <option value={{ campaign.id }}>{{ campaign.name }}</option>
+            {% endfor %}
+        </select>
+      <input type="submit" name="assign" value="Assign"/>
+    </form>
+{% endblock %}

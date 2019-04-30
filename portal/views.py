@@ -7,7 +7,10 @@ from django.core.exceptions import ObjectDoesNotExist
 
 @login_required
 def home(request):
-    return render(request, 'portal/home.html')
+    if request.user.is_superuser:
+        return redirect('crm_admin:home')
+    else:
+        return render(request, 'portal/home.html')
 
 
 @login_required

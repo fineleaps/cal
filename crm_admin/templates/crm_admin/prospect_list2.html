@@ -1,0 +1,50 @@
+{% extends "portal/base.html" %}
+
+{% block title %}Prospects{% endblock %}
+
+{% block content %}
+
+    <div class="jumbotron text-center">
+        <h3>My Prospect</h3>
+        <br>
+{#        <a href="{% url 'crm_admin:campaign_add' %}"><button class="btn btn-success">Add Campaign</button></a>#}
+        <br>
+        <hr>
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form|crispy }}
+        </form>
+
+        {% if prospects %}
+
+            <table class="table table-stripped table-bordered">
+
+                <tr>
+                    <td>Sr No.</td>
+                    <td>First name</td>
+                    <td>Last Name</td>
+                    <td>Industry Type</td>
+                    <td>Job Title</td>
+                </tr>
+
+                {% for prospect in prospects %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ prospect.first_name }}</td>
+                        <td>{{ prospect.last_name }}</td>
+                        <td>{{ prospect.industry_type }}</td>
+                        <td>{{ prospect.job_title }}</td>
+                    </tr>
+                {% endfor %}
+
+            </table>
+
+        {% else %}
+
+            <h3>No Prospects.</h3>
+
+        {% endif %}
+
+    </div>
+{% endblock %}
