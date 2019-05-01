@@ -1,17 +1,49 @@
-{% extends "portal/base.html" %}
+{% extends "crm_admin/base.html" %}
 {% load crispy_forms_tags %}
 
 {% block title %}Home{% endblock %}
 
 {% block content %}
 
-    <div class="jumbotron text-center">
 
-        <form method="post">
-            {% csrf_token %}
-            {{ form|crispy }}
-            <input value="Add" type="submit" class="btn btn-success">
-        </form>
+        <h3>Add Campaign</h3>
+        <hr>
 
-    </div>
+        <div class="container">
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="form-row">
+                    <div class="form-group col-lg-3">
+                        {{ form.name|as_crispy_field }}
+                    </div>
+                    <div class="form-group col-lg-3">
+                        {{ form.start_date|as_crispy_field }}
+                    </div>
+                    <div class="form-group col-lg-3">
+                        {{ form.end_date|as_crispy_field }}
+                    </div>
+                    <div class="form-group col-lg-3">
+                        {{ form.active_status|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-lg-6">
+                        {{ form.script|as_crispy_field }}
+                    </div>
+                    <div class="form-group col-lg-6">
+                        {{ form.details|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-lg-12">
+                        {{ form.executives|as_crispy_field }}
+                    </div>
+                </div>
+
+{#                {{ form|crispy }}#}
+                <input value="Add" type="submit" class="btn btn-success">
+            </form>
+        </div>
+
 {% endblock %}
